@@ -15,6 +15,11 @@ void chip8::init()
 	load();
 }
 
+void chip8::run()
+{
+	cout << "Running..." << endl;
+}
+
 void chip8::load()
 {
 	//TODO: Remove hard coded location
@@ -29,7 +34,7 @@ void chip8::load()
 		fseek(file, 0L, SEEK_SET);
 
 		// Allocate memory buffer. There's probably a  better way to do this but for now let's just get it working
-		unsigned char *buffer = (unsigned char*) malloc(fsize);
+		BYTE *buffer = (BYTE*) malloc(fsize);
 		// Read file contents into buffer and close file
 		fread(buffer, fsize, 1, file);
 		fclose(file);
