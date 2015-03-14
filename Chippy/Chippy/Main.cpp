@@ -7,11 +7,15 @@ using namespace std;
 int main()
 {
 	chip8 emulator;
+	emulator.run();
+
 	if (!glfwInit())
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
+
+	// Following code lifted from OpenGL tutorial
 	// Create window
 	glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
@@ -21,7 +25,7 @@ int main()
 
 	// Open a window and create its OpenGL context 
 	GLFWwindow* window; // (In the accompanying source code, this variable is global) 
-	window = glfwCreateWindow(1024, 768, "Tutorial 01", NULL, NULL);
+	window = glfwCreateWindow(640, 320, "There's my chippy", NULL, NULL);
 	if (window == NULL){
 		fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
 		glfwTerminate();
@@ -47,8 +51,7 @@ int main()
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
 	glfwWindowShouldClose(window) == 0);
 
-	emulator.run();
 
-	system("pause");
+	//system("pause");
 	return 0;
 }
