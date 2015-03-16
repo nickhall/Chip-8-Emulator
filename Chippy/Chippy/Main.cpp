@@ -16,8 +16,6 @@ int main(int argc, char *argv[])
 	//The surface contained by the window
 	SDL_Surface* gScreenSurface = NULL;
 
-	//The image we will load and show on the screen
-	SDL_Surface* gHelloWorld = NULL;
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
