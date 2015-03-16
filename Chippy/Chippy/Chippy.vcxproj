@@ -81,15 +81,9 @@
   <ItemGroup>
     <ClCompile Include="chip8.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chip8.h" />
-    <ClInclude Include="Shader.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="SimpleFragmentShader.fragmentshader" />
-    <None Include="SimpleVertexShader.vertexshader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
