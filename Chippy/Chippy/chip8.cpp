@@ -145,7 +145,7 @@ void chip8::decode(OPCODE input)
 			v[0xF] = *vxptr > *vyptr ? 1 : 0;
 			break;
 		case 0x6: // 8xy6 - SHR Vx {, Vy} - Set Vx = Vx SHR 1.
-			v[0xF] = input & 0x000F == 1 ? 1 : 0; // Shifting right, so detect whether we're bumping a bit off
+			v[0xF] = (input & 0x000F) == 1 ? 1 : 0; // Shifting right, so detect whether we're bumping a bit off
 			*vxptr = *vxptr >> 1;
 			break;
 		case 0x7: // 8xy7 - SUBN Vx, Vy - Set Vx = Vy - Vx, set VF = NOT borrow.
@@ -153,7 +153,7 @@ void chip8::decode(OPCODE input)
 			*vxptr = *vyptr - *vxptr;
 			break;
 		case 0xE: // 8xyE - SHL Vx {, Vy} - Set Vx = Vx SHL 1.
-			v[0xF] = *vxptr & 0xF000 == 0x1000 ? 1 : 0; // Shift left, so determine if we're popping off a bit
+			v[0xF] = (*vxptr & 0xF000) == 0x1000 ? 1 : 0; // Shift left, so determine if we're popping off a bit
 			*vxptr = *vxptr << 1;
 			break;
 		default:
@@ -197,7 +197,10 @@ void chip8::decode(OPCODE input)
 			break;
 		case 0x0A: // Fx0A - LD Vx, K - Wait for a key press, store the value of the key in Vx.
 			// TODO: Implement
-			cout << "Waiting for keypress" << endl;
+			cout << "Input: ";
+			int number;
+			cin >> number;
+			cout << endl;
 			break;
 		case 0x15: // Fx15 - LD DT, Vx - Set delay timer = Vx.
 			delay = *vxptr;
@@ -216,6 +219,18 @@ void chip8::decode(OPCODE input)
 			memory[index] = *vxptr / 100; // Hundreds
 			memory[index + 1] = *vxptr % 100 / 10; // Tens
 			memory[index + 2] = *vxptr % 10; // Ones
+			break;
+		case 0x55: // Fx55 - LD [I], Vx - Store registers V0 through Vx in memory starting at location I.
+			for (int i = 0; i < 16; i++)
+			{
+				memory[index + i] = v[i];
+			}
+			break;
+		case 0x65: // Fx65 - LD Vx, [I] - Read registers V0 through Vx from memory starting at location I.
+			for (int i = 0; i < 16; i++)
+			{
+				v[i] = memory[index + i];
+			}
 			break;
 		}
 	}
