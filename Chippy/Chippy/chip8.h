@@ -5,6 +5,7 @@ using namespace std;
 // TODO: Make sure I'm using header files correctly
 
 typedef unsigned char BYTE;
+typedef unsigned short OPCODE;
 
 class chip8
 {
@@ -13,6 +14,7 @@ public:
 	~chip8();
 	void init();
 	void run();
+	void update(float dt);
 	void pause();
 	void start();
 	void load();
@@ -20,12 +22,18 @@ public:
 private:
 	//istream file;					// Input file
 	unsigned char memory[4096];		// Main memory
-	int pc;							// Program counter
-	int sp;							// Stack pointer
+	int pc;							// Program counter, shouldn't be int but whatever
+	int sp;							// Stack pointer (see above)
+	int index;						// Index register
 	unsigned short stack[16];		// Stack
 	BYTE v[16];						// Registers
 	BYTE screen[32 * 64];			// Video buffer
-	unsigned short opcode;			// Opcode
+	OPCODE opcode;					// Opcode
 	BYTE key[16];					// Keyboard
-	//TODO: Sound and timers
+	BYTE delay;						// Delay timer
+	BYTE sound;						// Sound timer
+
+	void decode(OPCODE input);
+	
+	BYTE chip8_fontset[80];
 };
