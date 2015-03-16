@@ -1,5 +1,7 @@
 //#include <iostream>
 //#include <fstream>
+#include <stdlib.h>
+#include <time.h>
 #include "chip8.h"
 
 BYTE chip8_fontset[80] =
@@ -34,6 +36,7 @@ void chip8::init()
 	sp = 0;
 	index = 0;
 	// TODO: Clear screen, stack, registers, memory, etc.
+	srand(time(NULL)); // Seed random number for later
 	std::cout << "Emulator initialized" << std::endl;
 	load();
 
@@ -161,7 +164,60 @@ void chip8::decode(OPCODE input)
 		if (vx != vy) pc += 2;
 		break;
 	case 0xA: // Annn - LD I, addr - Set I = nnn.
-		
+		index = input & 0x0FFF;
+		break;
+	case 0xB: // Bnnn - JP V0, addr - Jump to location nnn + V0.
+		pc = v[0] + input & 0x0FFF;
+		break;
+	case 0xC: // Cxkk - RND Vx, byte - Set Vx = random byte AND kk.
+		*vxptr = kk & (rand() % 255);
+		break;
+	case 0xD: // Dxyn - DRW Vx, Vy, nibble - Display n - byte sprite starting at memory location I at(Vx, Vy), set VF = collision.
+		// TODO: Implement this
+		cout << "SPRITE OUTPUT: PLEASE IMPLEMENT" << endl;
+		break;
+	case 0xE:
+		if (kk == 0x9E) // Ex9E - SKP Vx - Skip next instruction if key with the value of Vx is pressed.
+		{
+			// TODO: Implement this plus key checking
+			cout << "WAITING FOR KEYBOARD" << endl;
+		}
+		if (kk == 0xA1) // ExA1 - SKNP Vx - Skip next instruction if key with the value of Vx is not pressed.
+		{
+			// TODO: Implement this plus key checking
+			cout << "WAITING FOR KEYBOARD" << endl;
+			pc += 2; // Skip anyway for now
+		}
+		break;
+	case 0xF: // 0xF instructions all follow 0xFx##, so we can use our kk shortcut
+		switch (kk)
+		{
+		case 0x07: // Fx07 - LD Vx, DT - Set Vx = delay timer value.
+			*vxptr = delay;
+			break;
+		case 0x0A: // Fx0A - LD Vx, K - Wait for a key press, store the value of the key in Vx.
+			// TODO: Implement
+			cout << "Waiting for keypress" << endl;
+			break;
+		case 0x15: // Fx15 - LD DT, Vx - Set delay timer = Vx.
+			delay = *vxptr;
+			break;
+		case 0x18: // Fx18 - LD ST, Vx - Set sound timer = Vx.
+			sound = *vxptr;
+			break;
+		case 0x1E: // Fx1E - ADD I, Vx - Set I = I + Vx.
+			index += *vxptr;
+			break;
+		case 0x29: // Fx29 - LD F, Vx - Set I = location of sprite for digit Vx.
+			// TODO: Implement
+			cout << "Sprite location" << endl;
+			break;
+		case 0x33: // Fx33 - LD B, Vx - Store BCD representation of Vx in memory locations I, I + 1, and I + 2.
+			memory[index] = *vxptr / 100; // Hundreds
+			memory[index + 1] = *vxptr % 100 / 10; // Tens
+			memory[index + 2] = *vxptr % 10; // Ones
+			break;
+		}
 	}
 }
 
