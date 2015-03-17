@@ -1,5 +1,3 @@
-//#include <iostream>
-//#include <fstream>
 #include <stdlib.h>
 #include <time.h>
 #include "chip8.h"
@@ -36,6 +34,7 @@ void chip8::init()
 	sp = 0;
 	index = 0;
 	// TODO: Clear screen, stack, registers, memory, etc.
+	clearScreen();
 	srand(time(NULL)); // Seed random number for later
 	std::cout << "Emulator initialized" << std::endl;
 	load();
@@ -44,13 +43,49 @@ void chip8::init()
 	for (int i = 0; i < 80; ++i)
 		memory[i] = chip8_fontset[i];
 
-	// Debugging: update once
-	update(0);
+	//The window we'll be rendering to
+	Window = NULL;
+
+	//The surface contained by the window
+	ScreenSurface = NULL;
+
+	//Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	{
+		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+	}
+	else
+	{
+		//Create window
+		Window = SDL_CreateWindow("There's my chippy", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 640, 320, SDL_WINDOW_SHOWN);
+		if (Window == NULL)
+		{
+			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+		}
+		else
+		{
+			//Get window surface
+			ScreenSurface = SDL_GetWindowSurface(Window);
+		}
+	}
+
+	renderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (renderer == nullptr)
+	{
+		SDL_DestroyWindow(Window);
+		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+		SDL_Quit();
+	}
 }
 
 void chip8::run()
 {
-	cout << "Running..." << endl;
+	running = true;
+	while (running)
+	{
+		update(0);
+	}
+	SDL_Quit();
 }
 
 void chip8::update(float dt)
@@ -63,10 +98,39 @@ void chip8::update(float dt)
 	pc += 2;
 	// Decode/execute
 	decode(opcode);
+
+	SDL_Event e;
+	while (SDL_PollEvent(&e))
+	{
+		if (e.type == SDL_QUIT)
+		{
+			running = false;
+		}
+	}
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Clear to black
+	SDL_RenderClear(renderer);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Draw white
+	SDL_Rect rect;
+	rect.x = 50;
+	rect.y = 50;
+	rect.h = 50;
+	rect.w = 50;
+	SDL_Rect rect2;
+	rect2.x = 150;
+	rect2.y = 150;
+	rect2.h = 50;
+	rect2.w = 50;
+
+	SDL_Rect rects[2];
+	rects[0] = rect;
+	rects[1] = rect2;
+	SDL_RenderFillRects(renderer, rects, 2);
+	SDL_RenderPresent(renderer);
 }
 
 void chip8::decode(OPCODE input)
 {
+	// TODO: Clean this up and consolidate pointer usage
 	bool throwError = false; // Use this as a flag to determine if an invalid opcode was entered
 	BYTE vx = v[input & 0x0F00 >> 8]; // Caching for operations of form #xkk
 	BYTE *vxptr = &v[input & 0x0F00 >> 8];
@@ -267,6 +331,14 @@ void chip8::load()
 	else
 	{
 		cout << "Couldn't find pong";
+	}
+}
+
+void chip8::clearScreen()
+{
+	for (int i = 0; i < (32 * 64); i++)
+	{
+		memory[i] = 0;
 	}
 }
 

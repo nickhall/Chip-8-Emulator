@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <fstream>
+#include <SDL.h>
 using namespace std;
 // TODO: Make sure I'm using header files correctly
 
@@ -32,8 +33,13 @@ private:
 	BYTE key[16];					// Keyboard
 	BYTE delay;						// Delay timer
 	BYTE sound;						// Sound timer
+	SDL_Renderer* renderer;
+	SDL_Window* Window;
+	SDL_Surface* ScreenSurface;
+	bool running;
 
 	void decode(OPCODE input);
+	void clearScreen();
 	
 	BYTE chip8_fontset[80];
 };
